@@ -4,38 +4,27 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const helmet = require('helmet')
 
-// const db = require("./models")
+const db = require("./api/models")
 
 
 const app = express()
 
-var corsOptions = {
-    origin: "http://localhost:8080"
-};
-
 app.use(morgan('tiny'))
-app.use(cors(corsOptions))
+app.use(cors())
 app.use(bodyParser.json())
 app.use(helmet())
 
 
+const apiRoutes =  require('./api/routes/api_routes')
 
-// db.sequelize.sync({ force: true }).then(() => {
-//     console.log("Drop and re-sync db.");
-// });
+// using the api routes
+app.use('/api', apiRoutes)
 
-app.get('/', (req, res) => {
-    res.json(
-        {
-            message: 'Hello word!!!'
-        }
-    )
-})
 
-// require("./api/routes/routes")(app);
 const port = process.env.PORT || 8080
 
-app.listen(port, () => {
-    console.log(`listening on ${port}`)
+db.sequelize.sync().then(() => {
+    app.listen(port, () => {
+        console.log(`listening on http://localhost:${port}`)
+    })
 })
-
